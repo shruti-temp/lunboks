@@ -15,7 +15,7 @@ class StoryTest(EventTest):
 class NightmaresTest(StoryTest):
   def setUp(self):
     super().setUp()
-    self.story = stories.PowerfulNightmares()
+    self.story = stories.DrifterStory()
     self.char.possessions.append(self.story)
 
   def testDontPassStory(self):

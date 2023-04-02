@@ -1,3 +1,5 @@
+from unittest import mock
+
 from eldritch.test_events import EventTest
 from eldritch import assets
 from eldritch import characters
@@ -119,12 +121,14 @@ class NunStoryTest(StoryTest):
     self.assertFalse(self.char.possessions[0].tokens["elder_sign"])
 
     self.advance_turn(2, "movement")
-    with mock_randint(1):
+    with mock.patch.object(events.random, "randint", new=mock.MagicMock(return_value=1)):
       self.resolve_to_usable(0, self.story.results[True])
       self.assertEqual(self.state.turn_phase, "upkeep")
+      self.assertIsInstance(self.state.event_stack[-1], events.DiceRoll)
+      self.assertEqual(self.state.event_stack[-1].roll, [1])
       self.state.done_using[0] = True
-    self.advance_turn(2, "movement")
-    self.assertFalse(self.gangster.possessions)
+      self.advance_turn(2, "movement")
+      self.assertFalse(self.gangster.possessions)
 
   def testFail(self):
     self.state.event_stack.append(events.Curse(self.char))

@@ -17,7 +17,7 @@ class StoryResult(assets.Card, metaclass=abc.ABCMeta):
       return self.get_in_play_event(owner)
     return None
 
-  def get_in_play_event(self, owner: characters.Character):
+  def get_in_play_event(self, owner: characters.Character):  # pylint: disable=unused-argument
     return events.Nothing()
 
 
@@ -31,7 +31,7 @@ class Story(assets.Card, metaclass=abc.ABCMeta):
     return events.Sequence([
         events.DiscardSpecific(character, [self]),
         events.DrawSpecific(character, "specials", self.results[pass_story])
-    ])
+    ], character)
 
 
 class DrifterStoryPass(StoryResult):
@@ -53,14 +53,14 @@ class DrifterStoryFail(StoryResult):
 
   def get_interrupt(self, event, owner, state):
     if not getattr(event, "character", None) == owner:
-      return
+      return super().get_interrupt(event, owner, state)
     if (
         (isinstance(event, events.KeepDrawn)
          and (getattr(event.drawn, "deck", None) == "allies"))
         or (isinstance(event, (events.DrawNamed, events.DrawItems)) and event.deck == "allies")
     ):
       return events.CancelEvent(event)
-    return
+    return super().get_interrupt(event, owner, state)
 
 
 class DrifterStory(Story):
@@ -76,7 +76,7 @@ class DrifterStory(Story):
         and (event.gate.name == "Dreamlands")
     ):
       return self.advance_story(owner, True)
-    elif (
+    if (
         isinstance(event, events.AddDoom)
         and state.ancient_one.doom >= 5
     ):
@@ -97,16 +97,19 @@ class NunStoryPass(StoryResult):
   def get_interrupt(self, event, owner, state):
     if isinstance(event, events.Curse) and event.character == owner:
       return events.CancelEvent(event)
+    return super().get_interrupt(event, owner, state)
 
   def get_usable_trigger(self, event, owner, state):
-    if isinstance(event, events.DiceRoll):
+    if isinstance(event, events.DiceRoll) and state.turn_phase == "upkeep":
+      # Note: I see nothing that says it has to be one of her dice
       # TODO: Allow user to select a die to reroll
-      to_reroll = events.Nothing()
+      to_reroll = [0]
+      # to_reroll = events.ChooseDie(event)
       return events.Sequence([
-          events.Nothing(),
           events.ExhaustAsset(owner, self),
           events.RerollSpecific(state.event_stack[-2].character, state.event_stack[-2], to_reroll),
       ], owner)
+    return None
 
   def get_in_play_event(self, owner: characters.Character):
     return events.Bless(owner)
@@ -127,6 +130,7 @@ class NunStory(Story):
   def __init__(self):
     super().__init__("He Is My Shepherd", "Fear No Evil", "I Shall Not Want")
     self.max_tokens["clue"] = 2
+    self.tokens["clue"] = 0
 
   def get_max_token_event(self, token_type, owner):
     if token_type == "clue":
@@ -135,17 +139,21 @@ class NunStory(Story):
 
   def get_trigger(self, event, owner, state):
     if isinstance(event, events.Bless):
-      return events.AddToken(self, "clue")
+      return events.AddToken(self, "clue", owner)
     if (
-        isinstance(event, events.KeepDrawn)
+        isinstance(event, events.BlessCurse)
         and (event.character == owner)
-        and values.ItemNameCount(owner, "Curse").value(state)
+        and event.is_resolved()
+        and values.ItemNameCount(owner, "Curse").value(state) == 1
     ):
+      print(values.ItemNameCount(owner, "Curse").value(state), owner.possessions)
       return self.advance_story(owner, False)
     return super().get_trigger(event, owner, state)
 
 
 def CreateStories():
   return [
-      DrifterStoryPass(), DrifterStoryFail(), DrifterStory()
+      DrifterStoryPass(), DrifterStoryFail(), DrifterStory(),
+      NunStoryPass(), NunStoryFail(), NunStory(),
+
   ]

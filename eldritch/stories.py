@@ -157,9 +157,9 @@ class NunStoryPass(StoryResult):
   def get_trigger(self, event, owner, state):
     # Once per turn, not technically "exhaust to ..."
     if (
-      self.exhausted
-      and isinstance(event, events.Mythos)
-      and event.is_done()
+        self.exhausted
+        and isinstance(event, events.Mythos)
+        and event.is_done()
     ):
       return events.RefreshAsset(owner, self)
 

@@ -211,8 +211,8 @@ class PhotographerStoryTest(StoryTest):
 
   def testPass(self):
     self.state.event_stack.append(events.Sequence([
-      events.TakeGateTrophy(self.char, self.state.gates[0]),
-      events.TakeGateTrophy(self.char, self.state.gates[1]),
+        events.TakeGateTrophy(self.char, self.state.gates[0]),
+        events.TakeGateTrophy(self.char, self.state.gates[1]),
     ], self.char))
     self.resolve_until_done()
     self.assertIn("There's Your Proof", [p.name for p in self.char.possessions])

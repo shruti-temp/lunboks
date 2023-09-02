@@ -235,7 +235,6 @@ class Research(assets.Asset):
       return events.RefreshAsset(owner, self)
 
 
-
 class UpkeepRestoreStat(assets.Asset):
 
   def __init__(self, name, stat, verb):

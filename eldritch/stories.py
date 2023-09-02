@@ -162,6 +162,7 @@ class NunStoryPass(StoryResult):
         and event.is_done()
     ):
       return events.RefreshAsset(owner, self)
+    return None
 
   def get_in_play_event(self, owner: characters.Character):
     return events.Bless(owner)

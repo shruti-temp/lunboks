@@ -233,6 +233,7 @@ class Research(assets.Asset):
         and event.is_done()
     ):
       return events.RefreshAsset(owner, self)
+    return None
 
 
 class UpkeepRestoreStat(assets.Asset):

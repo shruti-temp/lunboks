@@ -256,4 +256,4 @@ class ScientistStoryTest(StoryTest):
     )
     self.state.specials.remove(self.story)
     self.char.possessions.append(self.story)
-""" # pylint:  disable=pointless-string-statement
+"""  # pylint:  disable=pointless-string-statement

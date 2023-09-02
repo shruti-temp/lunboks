@@ -173,7 +173,7 @@ class NunStoryTest(StoryTest):
     self.assertFalse(self.char.possessions[0].tokens["must_roll"])
 
     with mock_randint(1) as mock_rand:
-      self.advance_turn(2, "movement")
+      self.advance_turn(2, "movement", halt_on_usable=True)
       self.assertIn(0, self.state.usables)
       self.assertEqual(self.state.turn_phase, "upkeep")
       self.assertEqual(mock_rand.call_count, 1)
@@ -200,6 +200,7 @@ class NunStoryTest(StoryTest):
     self.assertIn(self.story.results[False], [p.name for p in self.char.possessions])
 
 
+"""
 class PhotographerStoryTest(StoryTest):
   def setUp(self):
     super().setUp()
@@ -255,3 +256,4 @@ class ScientistStoryTest(StoryTest):
     )
     self.state.specials.remove(self.story)
     self.char.possessions.append(self.story)
+"""

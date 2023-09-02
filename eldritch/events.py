@@ -2776,6 +2776,8 @@ class RerollSpecificDice(Event):
 
     for idx, orig_idx in enumerate(self.reroll_indexes):
       self.dice_roll.roll[orig_idx] = self.dice.roll[idx]
+    self.dice_roll.sum = sum(self.dice_roll.roll)
+    self.dice_roll.successes = self.dice_roll.character.count_successes(self.dice_roll.roll, None)
     self.done = True
 
   def is_resolved(self):

@@ -218,7 +218,7 @@ class PhotographerStoryTest(StoryTest):
     ], self.char))
     self.resolve_until_done()
     self.assertIn("There's Your Proof", [p.name for p in self.char.possessions])
-    with mock_randint(1) as mock_rand:
+    with mock_randint(1):
       self.advance_turn(10, "upkeep")
     self.assertIn("Retainer", [p.name for p in self.char.possessions])
 
